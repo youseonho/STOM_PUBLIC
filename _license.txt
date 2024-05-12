@@ -1,4 +1,4 @@
-STOM LICENSE
+STOM_PUBLIC LICENSE
 
 1. STOM_PUBLIC은 STOM_MAESTRO의 공개버전입니다.
 2. STOM_MAESTRO의 주요기능 중 백테스트, 주문관리, 패턴인식, 시뮬레이터, 멀티스톰 기능이 제외되어 있습니다.
