@@ -1,5 +1,7 @@
 import sqlite3
 import pandas as pd
+from multiprocessing import Process
+from ui.ui_code_test import CodeTest
 from utility.setting import DB_STOCK_BACK, DB_COIN_BACK
 from utility.static import thread_decorator, timedelta_sec, now, qtest_qwait
 
@@ -38,7 +40,11 @@ def start_backtest_engine(ui, gubun, windowQ, wdzservQ, backQ, totalQ, webcQ):
 
 # noinspection PyUnusedLocal
 def back_code_test1(stg_code, testQ):
-    return True
+    print('전략 코드 오류 테스트 시작')
+    while not testQ.empty():
+        testQ.get()
+    Process(target=CodeTest, args=(testQ, stg_code), daemon=True).start()
+    return back_code_test_wait('전략', testQ)
 
 
 # noinspection PyUnusedLocal
