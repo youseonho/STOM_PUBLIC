@@ -38,7 +38,7 @@ def start_backtest_engine(ui, gubun, windowQ, wdzservQ, backQ, totalQ, webcQ):
 
 # noinspection PyUnusedLocal
 def back_code_test1(stg_code, testQ):
-    pass
+    return True
 
 
 # noinspection PyUnusedLocal

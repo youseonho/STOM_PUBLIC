@@ -39,8 +39,7 @@ def svjb_button_clicked_02(ui, proc_query, queryQ):
     elif strategy == '':
         QMessageBox.critical(ui, '오류 알림', '매수전략의 코드가 공백 상태입니다.\n코드를 작성하십시오.\n')
     else:
-        if 'self.tickcols' in strategy or (QApplication.keyboardModifiers() & Qt.ControlModifier) or ui.BackCodeTest1(
-                strategy):
+        if 'self.tickcols' in strategy or (QApplication.keyboardModifiers() & Qt.ControlModifier) or ui.BackCodeTest1(strategy):
             if proc_query.is_alive():
                 queryQ.put(('전략디비', f"DELETE FROM stockbuy WHERE `index` = '{strategy_name}'"))
                 df = pd.DataFrame({'전략코드': [strategy]}, index=[strategy_name])
