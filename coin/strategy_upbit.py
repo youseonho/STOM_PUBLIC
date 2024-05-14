@@ -555,101 +555,49 @@ class StrategyUpbit:
                 매수틱번호, 수익금, 수익률, 매입가, 보유수량, 분할매수횟수, 분할매도횟수, 매수시간, 보유시간, 최고수익률, 최저수익률 = 0, 0, 0, 0, 0, 0, 0, now_utc(), 0, 0, 0
             self.indexb = 매수틱번호
 
-            BBT = not self.dict_set['코인매수금지시간'] or not (self.dict_set['코인매수금지시작시간'] < 시분초 < self.dict_set['코인매수금지종료시간'])
-            BLK = not self.dict_set['코인매수금지블랙리스트'] or 종목코드 not in self.dict_set['코인블랙리스트']
-            C20 = not self.dict_set['코인매수금지200원이하'] or 현재가 > 200
             NIB = 종목코드 not in self.list_buy
             NIS = 종목코드 not in self.list_sell
 
-            A = 관심종목 and NIB and 매입가 == 0
-            B = self.dict_set['코인매수분할시그널']
-            C = NIB and 매입가 != 0 and 분할매수횟수 < self.dict_set['코인매수분할횟수']
-            D = NIB and self.dict_set['코인매도취소매수시그널'] and not NIS
+            if 관심종목 and NIB and 매입가 == 0:
+                매수수량 = round(self.int_tujagm / 현재가, 8)
+                매수 = True
+                if 시분초 < self.dict_set['코인장초전략종료시간']:
+                    if self.buystrategy1 is not None:
+                        try:
+                            exec(self.buystrategy1)
+                        except:
+                            print_exc()
+                            self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - BuyStrategy1'))
+                elif self.dict_set['코인장초전략종료시간'] <= 시분초 < self.dict_set['코인장중전략종료시간']:
+                    if self.buystrategy2 is not None:
+                        if not self.stg_change:
+                            self.vars = self.vars2
+                            self.stg_change = True
+                        try:
+                            exec(self.buystrategy2)
+                        except:
+                            print_exc()
+                            self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - BuyStrategy2'))
 
-            if BBT and BLK and C20 and (A or (B and C) or C or D):
-                매수수량 = 0
-
-                if A or (B and C) or C:
-                    oc_ratio = dict_order_ratio[self.dict_set['코인매수분할방법']][self.dict_set['코인매수분할횟수']][분할매수횟수]
-                    매수수량 = round(self.int_tujagm / (현재가 if 매입가 == 0 else 매입가) * oc_ratio / 100, 8)
-
-                if A or (B and C) or D:
-                    매수 = True
-                    if 시분초 < self.dict_set['코인장초전략종료시간']:
-                        if self.buystrategy1 is not None:
-                            try:
-                                exec(self.buystrategy1)
-                            except:
-                                print_exc()
-                                self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - BuyStrategy1'))
-                    elif self.dict_set['코인장초전략종료시간'] <= 시분초 < self.dict_set['코인장중전략종료시간']:
-                        if self.buystrategy2 is not None:
-                            if not self.stg_change:
-                                self.vars = self.vars2
-                                self.stg_change = True
-                            try:
-                                exec(self.buystrategy2)
-                            except:
-                                print_exc()
-                                self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - BuyStrategy2'))
-                elif C:
-                    매수 = False
-                    분할매수기준수익률 = round((현재가 / self.dict_buyinfo[종목코드][9] - 1) * 100, 2) if self.dict_set['코인매수분할고정수익률'] else 수익률
-                    if self.dict_set['코인매수분할하방'] and 분할매수기준수익률 < -self.dict_set['코인매수분할하방수익률']:
-                        매수 = True
-                    elif self.dict_set['코인매수분할상방'] and 분할매수기준수익률 > self.dict_set['코인매수분할상방수익률']:
-                        매수 = True
-
-                    if 매수:
-                        self.Buy(종목코드, 현재가, 매도호가1, 매수호가1, 매수수량, 데이터길이)
-
-            SBT = not self.dict_set['코인매도금지시간'] or not (self.dict_set['코인매도금지시작시간'] < 시분초 < self.dict_set['코인매도금지종료시간'])
-            SCC = self.dict_set['코인매수분할횟수'] == 1 or not self.dict_set['코인매도금지매수횟수'] or 분할매수횟수 > self.dict_set['코인매도금지매수횟수값']
             NIB = 종목코드 not in self.list_buy
-
-            A = NIB and NIS and SCC and 매입가 != 0 and self.dict_set['코인매도분할횟수'] == 1
-            B = self.dict_set['코인매도분할시그널']
-            C = NIB and NIS and SCC and 매입가 != 0 and 분할매도횟수 < self.dict_set['코인매도분할횟수']
-            D = NIS and self.dict_set['코인매수취소매도시그널'] and not NIB
-            E = NIB and NIS and 매입가 != 0 and self.dict_set['코인매도손절수익률청산'] and 수익률 < -self.dict_set['코인매도손절수익률']
-            F = NIB and NIS and 매입가 != 0 and self.dict_set['코인매도손절수익금청산'] and 수익금 < -self.dict_set['코인매도손절수익금']
-
-            if SBT and (A or (B and C) or C or D or E or F):
+            if NIB and NIS and 매입가 != 0:
                 매도 = False
-                매도수량 = 0
-                강제청산 = E or F
-
-                if A or E or F:
-                    매도수량 = 보유수량
-                elif (B and C) or C:
-                    oc_ratio = dict_order_ratio[self.dict_set['코인매도분할방법']][self.dict_set['코인매도분할횟수']][분할매도횟수]
-                    매도수량 = round(self.int_tujagm / 매입가 * oc_ratio / 100, 8)
-                    if 매도수량 > 보유수량 or 분할매도횟수 + 1 == self.dict_set['코인매도분할횟수']: 매도수량 = 보유수량
-
-                if A or (B and C) or D:
-                    if 시분초 < self.dict_set['코인장초전략종료시간']:
-                        if self.sellstrategy1 is not None:
-                            try:
-                                exec(self.sellstrategy1)
-                            except:
-                                print_exc()
-                                self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - SellStrategy1'))
-                    elif self.dict_set['코인장초전략종료시간'] <= 시분초 < self.dict_set['코인장중전략종료시간']:
-                        if self.sellstrategy2 is not None:
-                            try:
-                                exec(self.sellstrategy2)
-                            except:
-                                print_exc()
-                                self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - SellStrategy2'))
-                elif C or E or F:
-                    if 강제청산:
-                        매도 = True
-                    elif C:
-                        if self.dict_set['코인매도분할하방'] and 수익률 < -self.dict_set['코인매도분할하방수익률'] * (분할매도횟수 + 1):  매도 = True
-                        elif self.dict_set['코인매도분할상방'] and 수익률 > self.dict_set['코인매도분할상방수익률'] * (분할매도횟수 + 1): 매도 = True
-
-                    if 매도:
-                        self.Sell(종목코드, 현재가, 매도호가1, 매수호가1, 매도수량, 강제청산)
+                강제청산 = False
+                매도수량 = 보유수량
+                if 시분초 < self.dict_set['코인장초전략종료시간']:
+                    if self.sellstrategy1 is not None:
+                        try:
+                            exec(self.sellstrategy1)
+                        except:
+                            print_exc()
+                            self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - SellStrategy1'))
+                elif self.dict_set['코인장초전략종료시간'] <= 시분초 < self.dict_set['코인장중전략종료시간']:
+                    if self.sellstrategy2 is not None:
+                        try:
+                            exec(self.sellstrategy2)
+                        except:
+                            print_exc()
+                            self.windowQ.put((ui_num['C단순텍스트'], '시스템 명령 오류 알림 - SellStrategy2'))
 
         if 종목코드 in self.tuple_gsjm:
             self.df_gj.loc[종목코드] = 종목코드, 등락율, 고저평균대비등락율, 초당거래대금, 초당거래대금평균_, 당일거래대금, 체결강도, 체결강도평균_, 최고체결강도_
@@ -673,15 +621,6 @@ class StrategyUpbit:
             self.windowQ.put((ui_num['C단순텍스트'], f'전략스 연산 시간 알림 - 수신시간과 연산시간의 차이는 [{gap:.6f}]초입니다.'))
 
     def Buy(self, 종목코드, 현재가, 매도호가1, 매수호가1, 매수수량, 데이터길이):
-        if self.dict_set['코인장초패턴인식'] and not self.stg_change and self.pattern_buy1 is not None:
-            pattern = self.GetPattern(종목코드, '매수')
-            if pattern not in self.pattern_buy1:
-                return
-        elif self.dict_set['코인장중패턴인식'] and self.stg_change and self.pattern_buy2 is not None:
-            pattern = self.GetPattern(종목코드, '매수')
-            if pattern not in self.pattern_buy2:
-                return
-
         if '지정가' in self.dict_set['코인매수주문구분']:
             기준가격 = 현재가
             if self.dict_set['코인매수지정가기준가격'] == '매도1호가': 기준가격 = 매도호가1
@@ -707,15 +646,6 @@ class StrategyUpbit:
                 self.ctraderQ.put(('매수', 종목코드, 예상체결가, 매수수량, now(), False))
 
     def Sell(self, 종목코드, 현재가, 매도호가1, 매수호가1, 매도수량, 강제청산):
-        if self.dict_set['코인장초패턴인식'] and not self.stg_change and self.pattern_sell1 is not None:
-            pattern = self.GetPattern(종목코드, '매도')
-            if pattern not in self.pattern_sell1:
-                return
-        elif self.dict_set['코인장중패턴인식'] and self.stg_change and self.pattern_sell2 is not None:
-            pattern = self.GetPattern(종목코드, '매도')
-            if pattern not in self.pattern_sell2:
-                return
-
         if '지정가' in self.dict_set['코인매도주문구분'] and not 강제청산:
             기준가격 = 현재가
             if self.dict_set['코인매도지정가기준가격'] == '매도1호가': 기준가격 = 매도호가1
@@ -744,65 +674,3 @@ class StrategyUpbit:
         for code in list(self.dict_hilo.keys()):
             if code not in self.df_jg.index:
                 del self.dict_hilo[code]
-
-    def GetPattern(self, code, gubun):
-        if not self.stg_change:
-            arry_tick    = self.dict_tik_ar[code][self.indexn + 1 - self.dict_pattern1['인식구간']:self.indexn + 1, :]
-            dict_pattern = self.dict_pattern_buy1 if gubun == '매수' else self.dict_pattern_sell1
-        else:
-            arry_tick    = self.dict_tik_ar[code][self.indexn + 1 - self.dict_pattern2['인식구간']:self.indexn + 1, :]
-            dict_pattern = self.dict_pattern_buy2 if gubun == '매수' else self.dict_pattern_sell2
-
-        pattern = None
-        for factor, unit in dict_pattern.items():
-            pattern_ = None
-            if factor == '등락율':
-                pattern_ = arry_tick[:, 5]
-            elif factor == '당일거래대금':
-                pattern_ = arry_tick[:, 6]
-            elif factor == '체결강도':
-                pattern_ = arry_tick[:, 7]
-            elif factor == '초당매수금액':
-                bids     = arry_tick[:, 8]
-                price    = arry_tick[:, 1]
-                pattern_ = bids * price
-            elif factor == '초당매도금액':
-                asks     = arry_tick[:, 9]
-                price    = arry_tick[:, 1]
-                pattern_ = asks * price
-            elif factor == '순매수금액':
-                bids     = arry_tick[:, 8]
-                asks     = arry_tick[:, 9]
-                price    = arry_tick[:, 1]
-                pattern_ = (bids - asks) * price
-            elif factor == '초당거래대금':
-                pattern_ = arry_tick[:, 10]
-            elif factor == '고저평균대비등락율':
-                pattern_ = arry_tick[:, 11]
-            elif factor == '매도1잔량금액':
-                asks1    = arry_tick[:, 28]
-                price    = arry_tick[:, 18]
-                pattern_ = asks1 * price
-            elif factor == '매수1잔량금액':
-                bids1    = arry_tick[:, 29]
-                price    = arry_tick[:, 19]
-                pattern_ = bids1 * price
-            elif factor == '매도총잔량금액':
-                tasks    = arry_tick[:, 12]
-                price    = arry_tick[:, 1]
-                pattern_ = tasks * price
-            elif factor == '매수총잔량금액':
-                tbids    = arry_tick[:, 13]
-                price    = arry_tick[:, 1]
-                pattern_ = tbids * price
-            elif factor == '매도수5호가총금액':
-                t5ab     = arry_tick[:, 34]
-                price    = arry_tick[:, 1]
-                pattern_ = t5ab * price
-            pattern_ = pattern_ * unit
-            pattern_ = pattern_.astype(int)
-            if pattern is None:
-                pattern = pattern_
-            else:
-                pattern = np.r_[pattern, pattern_]
-        return pattern.tolist()

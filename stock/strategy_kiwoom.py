@@ -9,7 +9,7 @@ from talib import stream
 from traceback import print_exc
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from ui.ui_pattern import get_pattern_setup
-from utility.setting import DB_STRATEGY, DICT_SET, ui_num, columns_jg, columns_gj, dict_order_ratio, DB_STOCK_TICK, PATTERN_PATH
+from utility.setting import DB_STRATEGY, DICT_SET, ui_num, columns_jg, columns_gj, DB_STOCK_TICK, PATTERN_PATH
 # noinspection PyUnresolvedReferences
 from utility.static import now, strf_time, strp_time, int_hms, timedelta_sec, GetUvilower5, GetKiwoomPgSgSp, GetHogaunit, pickle_read
 
@@ -636,6 +636,7 @@ class StrategyKiwoom:
             NIB = 종목코드 not in self.list_buy
             if NIB and NIS and 매입가 != 0:
                 매도 = False
+                강제청산 = False
                 매도수량 = 보유수량
                 if 시분초 < self.dict_set['주식장초전략종료시간']:
                     if self.sellstrategy1 is not None:
