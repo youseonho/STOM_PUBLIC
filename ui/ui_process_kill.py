@@ -73,8 +73,11 @@ def process_kill(ui, wdzservQ, queryQ, kimpQ, creceivQ, ctraderQ):
         ui.proc_strategy_coin.kill()
 
     if ui.SimulatorProcessAlive():
-        ui.proc_simulator_rv.kill()
-        ui.proc_simulator_td.kill()
+        try:
+            ui.proc_simulator_rv.kill()
+            ui.proc_simulator_td.kill()
+        except:
+            pass
     if ui.BacktestProcessAlive():
         ui.BacktestProcessKill(1)
 

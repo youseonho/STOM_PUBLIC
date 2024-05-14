@@ -28,9 +28,6 @@ class DrawRealChart:
         self.chart_item_index = 0
         name, self.ui.ctpg_tik_arry = data[1:]
         coin = True if 'KRW' in name or 'USDT' in name else False
-        self.ui.ctpg_tik_xticks = [strp_time('%Y%m%d%H%M%S', str(int(x))).timestamp() for x in self.ui.ctpg_tik_data[0]]
-        xmin, xmax = self.ui.ctpg_tik_xticks[0], self.ui.ctpg_tik_xticks[-1]
-        hms = from_timestamp(xmax).strftime('%H:%M:%S')
 
         if self.ui.ct_pushButtonnn_04.text() == 'CHART 8':
             chart_count = 8
@@ -81,6 +78,10 @@ class DrawRealChart:
             else:
                 self.ui.ctpg_tik_data[i] = tick_arry[tick_arry != 0]
 
+        self.ui.ctpg_tik_xticks = [strp_time('%Y%m%d%H%M%S', str(int(x))).timestamp() for x in self.ui.ctpg_tik_data[0]]
+        xmin, xmax = self.ui.ctpg_tik_xticks[0], self.ui.ctpg_tik_xticks[-1]
+        hms = from_timestamp(xmax).strftime('%H:%M:%S')
+
         len_list = []
         tlen = len(self.ui.ctpg_tik_xticks)
         for data in list(self.ui.ctpg_tik_data.values()):
@@ -91,7 +92,7 @@ class DrawRealChart:
                 self.ui.ctpg[i].clear()
                 if factor == '현재가':
                     ymax = self.ui.ctpg_tik_data[ci('현재가')].max()
-                    ymin = min(self.ui.ctpg_tik_data[ci('이동평균1200')].min(), self.ui.ctpg_tik_data[ci('현재가')].min())
+                    ymin = self.ui.ctpg_tik_data[ci('현재가')].min()
                     self.ui.ctpg_tik_item[cii()] = self.ui.ctpg[i].plot(x=self.ui.ctpg_tik_xticks[len_list[ci('이동평균60')]:], y=self.ui.ctpg_tik_data[ci('이동평균60')], pen=(180, 180, 180))
                     self.ui.ctpg_tik_item[cii()] = self.ui.ctpg[i].plot(x=self.ui.ctpg_tik_xticks[len_list[ci('이동평균300')]:], y=self.ui.ctpg_tik_data[ci('이동평균300')], pen=(140, 140, 140))
                     self.ui.ctpg_tik_item[cii()] = self.ui.ctpg[i].plot(x=self.ui.ctpg_tik_xticks[len_list[ci('이동평균600')]:], y=self.ui.ctpg_tik_data[ci('이동평균600')], pen=(100, 100, 100))
@@ -99,7 +100,7 @@ class DrawRealChart:
                     self.ui.ctpg_tik_item[cii()] = self.ui.ctpg[i].plot(x=self.ui.ctpg_tik_xticks[len_list[ci('현재가')]:], y=self.ui.ctpg_tik_data[ci('현재가')], pen=(200, 50, 50))
                     self.ui.ctpg_tik_cline = pg.InfiniteLine(angle=0)
                     self.ui.ctpg_tik_cline.setPen(pg.mkPen(color_fg_bt))
-                    self.ui.ctpg_tik_cline.setPos(self.ui.ctpg_tik_data[ci(5)][-1])
+                    self.ui.ctpg_tik_cline.setPos(self.ui.ctpg_tik_data[ci('현재가')][-1])
                     self.ui.ctpg[i].addItem(self.ui.ctpg_tik_cline)
                 elif factor == '체결강도':
                     ymax = max(self.ui.ctpg_tik_data[ci('체결강도')].max(), self.ui.ctpg_tik_data[ci('최고체결강도')].max())

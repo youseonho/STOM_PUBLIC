@@ -14,11 +14,11 @@ from cryptography.fernet import Fernet
 
 def threading_timer(sec, func, args=None):
     if args is None:
-        Timer(int(sec), func).start()
+        Timer(float(sec), func).start()
     elif type(args) == list:
-        Timer(int(sec), func, args=args).start()
+        Timer(float(sec), func, args=args).start()
     else:
-        Timer(int(sec), func, args=[args]).start()
+        Timer(float(sec), func, args=[args]).start()
 
 
 def get_port_number():

@@ -9,6 +9,7 @@ from multiprocessing import Process, Queue
 from trader_kiwoom import TraderKiwoom
 from receiver_kiwoom import ReceiverKiwoom
 from strategy_kiwoom import StrategyKiwoom
+from stock.simulator_kiwoom import ReceiverKiwoom2, TraderKiwoom2
 from login_kiwoom.manuallogin import find_window
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from utility.setting import DICT_SET, LOGIN_PATH
@@ -185,10 +186,21 @@ class KiwoomManager:
             self.StockTraderStart()
 
     def SimulatorStart(self):
-        pass
+        if self.backtest_engine:
+            print('백테엔진 구동 중에는 시뮬레이터를 실행할 수 없습니다.')
+            return
+        self.proc_simulator_rv    = Process(target=ReceiverKiwoom2, args=(self.qlist,), daemon=True)
+        self.proc_simulator_td    = Process(target=TraderKiwoom2, args=(self.qlist,), daemon=True)
+        self.proc_strategy_stock1 = Process(target=StrategyKiwoom, args=(0, self.qlist,), daemon=True)
+        self.proc_strategy_stock1.start()
+        self.proc_simulator_td.start()
+        self.proc_simulator_rv.start()
 
     def SimulatorProcessKill(self):
-        pass
+        if self.SimulatorProcessAlive():
+            self.proc_simulator_td.kill()
+            self.proc_simulator_rv.kill()
+            self.proc_strategy_stock1.kill()
 
     def StockReceiverProcessKill(self):
         if self.StockReceiverProcessAlive():
@@ -196,14 +208,17 @@ class KiwoomManager:
 
     def StockStrategyProcessKill(self):
         if self.StockStrategyProcessAlive():
-            self.proc_strategy_stock1.kill()
-            self.proc_strategy_stock2.kill()
-            self.proc_strategy_stock3.kill()
-            self.proc_strategy_stock4.kill()
-            self.proc_strategy_stock5.kill()
-            self.proc_strategy_stock6.kill()
-            self.proc_strategy_stock7.kill()
-            self.proc_strategy_stock8.kill()
+            try:
+                self.proc_strategy_stock1.kill()
+                self.proc_strategy_stock2.kill()
+                self.proc_strategy_stock3.kill()
+                self.proc_strategy_stock4.kill()
+                self.proc_strategy_stock5.kill()
+                self.proc_strategy_stock6.kill()
+                self.proc_strategy_stock7.kill()
+                self.proc_strategy_stock8.kill()
+            except:
+                pass
 
     def StockTraderProcessKill(self):
         if self.StockTraderProcessAlive():

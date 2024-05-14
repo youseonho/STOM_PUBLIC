@@ -98,11 +98,11 @@ class Chart:
             coin, code, tickcount, searchdate, starttime, endtime, k_list, detail, buytimes = data
 
         if coin:
-            db_name1 = DB_COIN_BACK
-            db_name2 = f'{DB_PATH}/coin_tick_{searchdate}.db'
+            db_name1 = f'{DB_PATH}/coin_tick_{searchdate}.db'
+            db_name2 = DB_COIN_BACK
         else:
-            db_name1 = DB_STOCK_BACK
-            db_name2 = f'{DB_PATH}/stock_tick_{searchdate}.db'
+            db_name1 = f'{DB_PATH}/stock_tick_{searchdate}.db'
+            db_name2 = DB_STOCK_BACK
 
         query1 = f"SELECT * FROM '{code}' WHERE `index` LIKE '{searchdate}%' and " \
                  f"`index` % 1000000 >= {starttime} and " \
