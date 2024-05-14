@@ -9,7 +9,7 @@ from traceback import print_exc
 from ui.ui_pattern import get_pattern_setup
 # noinspection PyUnresolvedReferences
 from utility.static import now, now_utc, strp_time, int_hms_utc, timedelta_sec, GetBinanceShortPgSgSp, GetBinanceLongPgSgSp, pickle_read
-from utility.setting import DB_STRATEGY, DICT_SET, ui_num, columns_jgf, columns_gj, dict_order_ratio, PATTERN_PATH
+from utility.setting import DB_STRATEGY, DICT_SET, ui_num, columns_jgf, columns_gj, PATTERN_PATH
 
 
 # noinspection PyUnusedLocal

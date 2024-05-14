@@ -1,7 +1,4 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMessageBox, QApplication
-from multiprocessing import Process
-from ui.ui_pattern import get_pattern_text, get_pattern_setup
+from PyQt5.QtWidgets import QMessageBox
 from ui.set_style import style_bc_by, style_bc_dk, style_bc_bs, style_bc_bd
 from ui.set_text import testtext, rwfttext, gaoptext, vedittxt, optitext, condtext, cedittxt, example_finder
 
