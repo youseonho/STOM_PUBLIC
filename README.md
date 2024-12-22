@@ -10,6 +10,6 @@ STOM_PUBLIC LICENSE
 8. 주식 데이터를 타인에게 공유할 경우 코스콤 또는 한국거래소와 법적 다툼이 생길 수 있습니다.
 9. 사용상 발생한 불이익은 사용자 본인의 책임입니다.
 10. 인트로 동영상은 k-lite 동영상 코덱을 설치해야 볼 수 있습니다. 미설치시 cmd창 오류 표시됨
-11. 설치 및 환경설정 방법 동영상 링크 https://www.youtube.com/@mpsoulman
+11. 설치 및 환경설정 방법 동영상 링크 https://www.youtube.com/@stomlive
 12. STOM_PUBLIC 전용 단톡방 https://open.kakao.com/o/gQTb4DRd 비번 stomer
 13. STOM_PUBLIC 코드에 대한 질문은 단톡방을 이용해주십시오.
